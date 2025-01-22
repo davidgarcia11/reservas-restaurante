@@ -103,10 +103,10 @@ function FormularioReserva() {
       {mensaje && (
         <div
           className={`mb-4 p-4 rounded ${tipoMensaje === "exito"
-              ? "bg-green-100 text-green-700"
-              : tipoMensaje === "error"
-                ? "bg-red-100 text-red-700"
-                : "bg-blue-100 text-blue-700"
+            ? "bg-green-100 text-green-700"
+            : tipoMensaje === "error"
+              ? "bg-red-100 text-red-700"
+              : "bg-blue-100 text-blue-700"
             }`}
         >
           {mensaje}
@@ -221,8 +221,16 @@ function FormularioReserva() {
             Borrar Reserva
           </a>
         </button>
+        <button
+          
+          className="ml-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          <a href="/restaurantes" className="text-white">
+            Acceder Restaurantes
+          </a>
+        </button>
       </div>
-      
+
     </form>
   );
 }
