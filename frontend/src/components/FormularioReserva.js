@@ -1,41 +1,44 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 function FormularioReserva() {
   const [restaurantes, setRestaurantes] = useState([]);
-  const [restauranteSeleccionado, setRestauranteSeleccionado] = useState(""); // Inicializamos como una cadena vacía
+  const [restauranteSeleccionado, setRestauranteSeleccionado] = useState("");
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
-  const [servicio, setServicio] = useState(""); // 'comida' o 'cena'
+  const [servicio, setServicio] = useState("");
   const [numPersonas, setNumPersonas] = useState(1);
+  const [mensaje, setMensaje] = useState("");
+  const [tipoMensaje, setTipoMensaje] = useState(""); // 'exito' o 'error'
 
   // Obtener la lista de restaurantes al cargar el componente
   useEffect(() => {
     const obtenerRestaurantes = async () => {
-      const respuesta = await fetch("http://localhost:3001/restaurantes");
-      const datos = await respuesta.json();
-      setRestaurantes(datos);
+      try {
+        const respuesta = await fetch("http://localhost:3001/restaurantes");
+        const datos = await respuesta.json();
+        setRestaurantes(datos);
+      } catch (error) {
+        console.error("Error al obtener los restaurantes:", error);
+        setMensaje("Error al cargar los restaurantes. Inténtalo más tarde.");
+        setTipoMensaje("error");
+      }
     };
 
     obtenerRestaurantes();
   }, []);
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Evita que la página se recargue al enviar el formulario
+    event.preventDefault();
 
-    // Validar los datos del formulario (puedes añadir más validaciones aquí)
-    if (
-      !restauranteSeleccionado ||
-      !fecha ||
-      !hora ||
-      !servicio ||
-      !numPersonas
-    ) {
-      alert("Por favor, completa todos los campos del formulario.");
+    if (!restauranteSeleccionado || !fecha || !hora || !servicio || !numPersonas) {
+      setMensaje("Por favor, completa todos los campos del formulario.");
+      setTipoMensaje("error");
       return;
     }
 
     try {
-      // Envía una petición POST a la API para crear la reserva
       const respuesta = await fetch("http://localhost:3001/reservas", {
         method: "POST",
         headers: {
@@ -50,20 +53,25 @@ function FormularioReserva() {
       });
 
       if (respuesta.ok) {
-        // La reserva se creó correctamente
-        console.log("Reserva creada");
-        // Aquí puedes redirigir al usuario a una página de confirmación o mostrar un mensaje de éxito
+        setMensaje("¡Reserva realizada con éxito!");
+        setTipoMensaje("exito");
+        // Reiniciar el formulario
+        setRestauranteSeleccionado("");
+        setFecha("");
+        setHora("");
+        setServicio("");
+        setNumPersonas(1);
       } else {
-        console.error("Error al crear la reserva");
-        // Aquí puedes mostrar un mensaje de error al usuario
+        setMensaje("Error al realizar la reserva. Inténtalo nuevamente.");
+        setTipoMensaje("error");
       }
     } catch (error) {
       console.error("Error al crear la reserva:", error);
-      // Aquí puedes mostrar un mensaje de error al usuario
+      setMensaje("Hubo un problema con el servidor. Inténtalo más tarde.");
+      setTipoMensaje("error");
     }
   };
 
-  // Funciones para actualizar el estado del formulario cuando cambian los valores de los campos
   const handleRestauranteChange = (event) => {
     setRestauranteSeleccionado(event.target.value);
   };
@@ -74,7 +82,7 @@ function FormularioReserva() {
 
   const handleServicioChange = (event) => {
     setServicio(event.target.value);
-    setHora(""); // Reinicia la hora cuando se cambia el servicio
+    setHora("");
   };
 
   const handleHoraChange = (event) => {
@@ -85,8 +93,26 @@ function FormularioReserva() {
     setNumPersonas(parseInt(event.target.value, 10));
   };
 
+  const handleModificarReserva = () => {
+    setMensaje("Funcionalidad para modificar reservas próximamente.");
+    setTipoMensaje("info");
+  };
+
   return (
     <form onSubmit={handleSubmit} className="p-4">
+      {mensaje && (
+        <div
+          className={`mb-4 p-4 rounded ${tipoMensaje === "exito"
+              ? "bg-green-100 text-green-700"
+              : tipoMensaje === "error"
+                ? "bg-red-100 text-red-700"
+                : "bg-blue-100 text-blue-700"
+            }`}
+        >
+          {mensaje}
+        </div>
+      )}
+
       <select
         id="restaurante"
         value={restauranteSeleccionado}
@@ -101,7 +127,6 @@ function FormularioReserva() {
         ))}
       </select>
 
-      {/* Campo para seleccionar la fecha */}
       <div className="mb-4">
         <label htmlFor="fecha" className="block text-gray-700 font-bold mb-2">
           Fecha:
@@ -115,12 +140,8 @@ function FormularioReserva() {
         />
       </div>
 
-      {/* Campo para seleccionar el servicio (comida o cena) */}
       <div className="mb-4">
-        <label
-          htmlFor="servicio"
-          className="block text-gray-700 font-bold mb-2"
-        >
+        <label htmlFor="servicio" className="block text-gray-700 font-bold mb-2">
           Servicio:
         </label>
         <select
@@ -135,7 +156,6 @@ function FormularioReserva() {
         </select>
       </div>
 
-      {/* Campo para seleccionar la hora (se muestra solo si se ha seleccionado un servicio) */}
       {servicio && (
         <div className="mb-4">
           <label htmlFor="hora" className="block text-gray-700 font-bold mb-2">
@@ -170,12 +190,8 @@ function FormularioReserva() {
         </div>
       )}
 
-      {/* Campo para indicar el número de personas */}
       <div className="mb-4">
-        <label
-          htmlFor="numPersonas"
-          className="block text-gray-700 font-bold mb-2"
-        >
+        <label htmlFor="numPersonas" className="block text-gray-700 font-bold mb-2">
           Número de personas:
         </label>
         <input
@@ -188,13 +204,25 @@ function FormularioReserva() {
         />
       </div>
 
-      {/* Botón para enviar el formulario */}
-      <button
-        type="submit"
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-      >
-        Reservar
-      </button>
+      <div className="flex gap-4">
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Reservar
+        </button>
+        <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          <a href="/modificar-reserva" className="text-white">
+            Modificar Reserva
+          </a>
+        </button>
+        <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          <a href="/borrar-reserva" className="text-white">
+            Borrar Reserva
+          </a>
+        </button>
+      </div>
+      
     </form>
   );
 }
