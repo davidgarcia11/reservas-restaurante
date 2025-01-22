@@ -153,6 +153,24 @@ function FormularioCrearRestaurante() {
           Crear Restaurante
         </button>
       </form>
+      <button
+        onClick={() => navigate("/modificar-restaurante")}
+        className="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      >
+        Modificar Restaurante
+      </button>
+      <button
+          onClick={() => navigate("/borrar-restaurante")}
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Borrar Restaurante
+        </button>
+        <button
+          onClick={() => navigate("/ver-restaurantes")}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Ver Restaurantes
+        </button>
     </div>
   );
 }
