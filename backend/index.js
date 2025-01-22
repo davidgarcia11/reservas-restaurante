@@ -97,6 +97,47 @@ app.put('/restaurantes', async (req, res) => {
     }
   }); 
 
+//-----------
+//DELETE
+// Ruta para eliminar un restaurante por su ID
+app.delete('/restaurantes/:id', async (req, res) => {
+  try {
+    const restaurante = await Restaurante.findByPk(req.params.id);
+    if (restaurante) {
+      await restaurante.destroy();
+      res.json({ message: 'Restaurante eliminado correctamente' });
+    } else {
+      res.status(404).json({ error: 'Restaurante no encontrado' });
+    }
+  } catch (error) {
+    console.error('Error al eliminar el restaurante:', error);
+    res.status(500).json({ error: 'Error al eliminar el restaurante' });
+  }
+});
+
+// Ruta para eliminar un restaurante por su nombre
+app.delete('/restaurantes', async (req, res) => {
+  try {
+    const { nombre } = req.query;
+
+    if (!nombre) {
+      return res.status(400).json({ error: 'Debes proporcionar el nombre del restaurante' });
+    }
+
+    const restaurante = await Restaurante.findOne({ where: { nombre } });
+
+    if (restaurante) {
+      await restaurante.destroy();
+      res.json({ message: 'Restaurante eliminado correctamente' });
+    } else {
+      res.status(404).json({ error: 'Restaurante no encontrado' });
+    }
+  } catch (error) {
+    console.error('Error al eliminar el restaurante:', error);
+    res.status(500).json({ error: 'Error al eliminar el restaurante' });
+  }
+});
+
 
 app.listen(port, () => {
     console.log(`Servidor iniciado en el puerto ${port}`);
