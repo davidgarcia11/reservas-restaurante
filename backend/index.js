@@ -1,11 +1,13 @@
 const express = require('express');
+const cors = require('cors');
 const { Op } = require("sequelize");
 const app = express();
-const port = 3000;
+const port = 3001;
 const Restaurante = require('./restaurante'); // Importa el modelo Restaurante
 
 // Middleware para procesar datos en formato JSON
 app.use(express.json());
+app.use(cors());
 
 //-----------
 // RESTAURANTES
